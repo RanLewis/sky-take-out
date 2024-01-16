@@ -51,16 +51,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
         //密码比对
         // 对前端传递的明文密码进行md5加密处理
-        password = DigestUtils.md5DigestAsHex(password.getBytes());
-        if (!password.equals(employee.getPassword())) {
-            //密码错误
-            throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
-        }
-
-        if (employee.getStatus() == StatusConstant.DISABLE) {
-            //账号被锁定
-            throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
-        }
+        comparePassword(password, employee);
 
         //3、返回实体对象
         return employee;
@@ -159,6 +150,18 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void editPassword(PasswordEditDTO passwordEditDTO) {
         Employee employee = employeeMapper.selectEmpById(BaseContext.getCurrentId());
         String password = passwordEditDTO.getOldPassword();
+        comparePassword(password, employee);
+        employee.setPassword(DigestUtils.md5DigestAsHex(passwordEditDTO.getNewPassword().getBytes()));
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * 对比密码
+     *
+     * @param password
+     * @param employee
+     */
+    private static void comparePassword(String password, Employee employee) {
         //密码比对
         // 对前端传递的明文密码进行md5加密处理
         password = DigestUtils.md5DigestAsHex(password.getBytes());
@@ -171,8 +174,6 @@ public class EmployeeServiceImpl implements EmployeeService {
             //账号被锁定
             throw new AccountLockedException(MessageConstant.ACCOUNT_LOCKED);
         }
-        employee.setPassword(DigestUtils.md5DigestAsHex(passwordEditDTO.getNewPassword().getBytes()));
-        employeeMapper.update(employee);
     }
 
 }

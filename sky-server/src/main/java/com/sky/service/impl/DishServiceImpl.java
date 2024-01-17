@@ -54,6 +54,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 分页查询
+     *
      * @param dishDTO
      * @return
      */
@@ -66,6 +67,7 @@ public class DishServiceImpl implements DishService {
 
     /**
      * 根据id删除
+     *
      * @param ids
      */
     @Override
@@ -89,6 +91,22 @@ public class DishServiceImpl implements DishService {
             dishMapper.deleteById(id);
         }
 
+    }
+
+    /**
+     * 根据id查询
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public DishVO getByIdWithFlavor(Long id) {
+        DishVO dishVO = new DishVO();
+        Dish dish = dishMapper.getById(id);
+        BeanUtils.copyProperties(dish, dishVO);
+        List<DishFlavor> dishFlavors = dishFlavorMapper.getByDishId(id);
+            dishVO.setFlavors(dishFlavors);
+        return dishVO;
     }
 
 }

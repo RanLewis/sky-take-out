@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 菜品管理
  */
@@ -21,14 +23,15 @@ import org.springframework.web.bind.annotation.*;
 public class DishController {
 
     @Autowired
-    public DishService dishService;
+    private DishService dishService;
+
     /**
      * 新增菜品
      */
     @PostMapping
     @ApiOperation(value = "新增菜品")
     public Result addDish(@RequestBody DishDTO dishDTO) {
-        log.info("新增菜品:{}",dishDTO);
+        log.info("新增菜品:{}", dishDTO);
         dishService.addDishWithFlavor(dishDTO);
         return Result.success();
     }
@@ -39,7 +42,18 @@ public class DishController {
     @GetMapping("/page")
     @ApiOperation(value = "菜品分页查询")
     public Result<PageResult> page(DishPageQueryDTO dishDTO) {
-        log.info("菜品分页查询:{}",dishDTO);
+        log.info("菜品分页查询:{}", dishDTO);
         return Result.success(dishService.pageQuery(dishDTO));
+    }
+
+    /**
+     * 批量删除菜品
+     */
+    @DeleteMapping
+    @ApiOperation(value = "删除菜品")
+    public Result deleteDish(@RequestParam List<Long> ids) {
+        log.info("删除菜品:{}", ids);
+        dishService.deleteByIds(ids);
+        return Result.success();
     }
 }

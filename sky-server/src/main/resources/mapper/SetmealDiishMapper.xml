@@ -8,4 +8,12 @@
             #{id}
         </foreach>
     </select>
+
+    <insert id="insert" parameterType="list">
+        insert into sky_take_out.setmeal_dish (setmeal_id, dish_id, copies, price, name)
+        values
+        <foreach collection="setmealDish" item="sd"  separator="," >
+            (#{sd.setmealId},#{sd.dishId},#{sd.copies},#{sd.price},#{sd.name})
+        </foreach>
+    </insert>
 </mapper>

@@ -1,6 +1,9 @@
 package com.sky.mapper;
 
+import com.github.pagehelper.Page;
 import com.sky.annotation.AutoFill;
+import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Setmeal;
 import com.sky.enumeration.OperationType;
 import com.sky.vo.SetmealVO;
 import org.apache.ibatis.annotations.Insert;
@@ -22,12 +25,20 @@ public interface SetmealMapper {
     /**
      * 新增套餐
      *
-     * @param setmealVO
+     * @param setmeal
      */
     @AutoFill(value = OperationType.INSERT)
     @Insert("insert into sky_take_out.setmeal (category_id, status, description, image, name, price," +
             " create_time, create_user, update_time, update_user) " +
             "values (#{categoryId}, #{status}, #{description}, #{image}, #{name}, " +
-            "#{price}, #{createeTime}, #{createUser}, #{updateTime}, #{updateUser})")
-    void insertSetmeal(SetmealVO setmealVO);
+            "#{price}, #{createTime}, #{createUser}, #{updateTime}, #{updateUser})")
+    void insertSetmeal(Setmeal setmeal);
+
+    /**
+     * 分页查询套餐
+     *
+     * @param setmealPageQueryDTO
+     * @return
+     */
+    Page<SetmealVO> pageQuery(SetmealPageQueryDTO setmealPageQueryDTO);
 }

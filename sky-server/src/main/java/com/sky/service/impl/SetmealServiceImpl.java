@@ -1,9 +1,7 @@
 package com.sky.service.impl;
 
-import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
-import com.sky.entity.Dish;
-import com.sky.entity.SetmealDish;
+import com.sky.entity.Setmeal;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.service.SetmealService;
@@ -13,10 +11,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
-@Slf4j
 @Service
+@Slf4j
 public class SetmealServiceImpl implements SetmealService {
     @Autowired
     private SetmealMapper setmealMapper;
@@ -25,18 +21,13 @@ public class SetmealServiceImpl implements SetmealService {
 
     /**
      * 新增套餐
-     *
      * @param setmealDTO
      */
     @Override
     public void addSetmeal(SetmealDTO setmealDTO) {
-        SetmealVO setmealVO = new SetmealVO();
-        BeanUtils.copyProperties(setmealDTO, setmealVO);
-        setmealMapper.insertSetmeal(setmealVO);
-        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
-        for (SetmealDish setmealDish : setmealDishes) {
-            setmealDishMapper.insert(setmealDish);
-        }
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO,setmeal);
+        setmealMapper.insertSetmeal(setmeal);
+        setmealDishMapper.insert(setmealDTO.getSetmealDishes());
     }
-
 }

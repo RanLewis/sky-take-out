@@ -1,6 +1,8 @@
 package com.sky.mapper;
 
+import com.sky.annotation.AutoFill;
 import com.sky.entity.SetmealDish;
+import com.sky.enumeration.OperationType;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -22,7 +24,5 @@ public interface SetmealDishMapper {
      *
      * @param setmealDish
      */
-    @Insert("insert into sky_take_out.setmeal_dish (setmeal_id, dish_id, copies, price, name) " +
-            "values (#{setmealId}, #{dishId}, #{copies}, #{price}, #{name})")
-    void insert(SetmealDish setmealDish);
+    void insert(List<SetmealDish> setmealDish);
 }

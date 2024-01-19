@@ -46,4 +46,13 @@ public interface SetmealMapper {
      * @param ids
      */
     void delete(List<Long> ids);
+
+    /**
+     * 根据id查询套餐
+     *
+     * @param id
+     * @return
+     */
+    @Select("select * from sky_take_out.setmeal where id = #{id}")
+    SetmealVO selectById(Long id);
 }

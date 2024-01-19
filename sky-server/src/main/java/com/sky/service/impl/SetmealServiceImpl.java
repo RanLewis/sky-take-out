@@ -20,6 +20,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -105,5 +106,25 @@ public class SetmealServiceImpl implements SetmealService {
                 .status(status)
                 .build();
         setmealMapper.update(setmeal);
+    }
+
+    /**
+     * 修改套餐
+     *
+     * @param setmealDTO
+     */
+    @Override
+    public void update(SetmealDTO setmealDTO) {
+        Setmeal setmeal = new Setmeal();
+        BeanUtils.copyProperties(setmealDTO, setmeal);
+        setmealMapper.update(setmeal);
+
+        List<SetmealDish> setmealDishes = setmealDTO.getSetmealDishes();
+        List<Long> list = new ArrayList<>();
+        Long id = setmeal.getId();
+        list.add(id);
+        setmealDishMapper.deleteBySetmealIds(list);
+        setmealDishes.forEach(setmealDish -> setmealDish.setSetmealId(id));
+        setmealDishMapper.insert(setmealDishes);
     }
 }

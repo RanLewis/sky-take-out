@@ -28,10 +28,6 @@ public interface SetmealMapper {
      * @param setmeal
      */
     @AutoFill(value = OperationType.INSERT)
-    @Insert("insert into sky_take_out.setmeal (category_id, status, description, image, name, price," +
-            " create_time, create_user, update_time, update_user) " +
-            "values (#{categoryId}, #{status}, #{description}, #{image}, #{name}, " +
-            "#{price}, #{createTime}, #{createUser}, #{updateTime}, #{updateUser})")
     void insertSetmeal(Setmeal setmeal);
 
     /**

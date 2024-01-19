@@ -53,4 +53,15 @@ public class SetmealServiceImpl implements SetmealService {
         Page<SetmealVO> page = setmealMapper.pageQuery(setmealPageQueryDTO);
         return new PageResult(page.getTotal(), page.getResult());
     }
+
+    /**
+     * 删除套餐
+     *
+     * @param ids
+     */
+    @Override
+    public void delete(List<Long> ids) {
+        setmealMapper.delete(ids);
+        setmealDishMapper.deleteBySetmealIds(ids);
+    }
 }

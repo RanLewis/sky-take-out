@@ -25,4 +25,10 @@ public interface SetmealDishMapper {
      * @param setmealDish
      */
     void insert(List<SetmealDish> setmealDish);
+
+    /**
+     * 根据套餐id删除
+     * @param ids
+     */
+    void deleteBySetmealIds(List<Long> ids);
 }

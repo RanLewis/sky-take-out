@@ -2,6 +2,7 @@ package com.sky.controller.admin;
 
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Setmeal;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
@@ -77,5 +78,13 @@ public class SetmealController {
         log.info("根据id查询套餐：{}", id);
         SetmealVO setmealVO = setmealService.selectById(id);
         return Result.success(setmealVO);
+    }
+
+    @PostMapping("/status/{status}")
+    @ApiOperation("修改套餐状态")
+    public Result updateStatus(@PathVariable Integer status, Long id) {
+        log.info("修改套餐状态：{}，id：{}", status, id);
+        setmealService.updateStatus(status, id);
+        return Result.success();
     }
 }

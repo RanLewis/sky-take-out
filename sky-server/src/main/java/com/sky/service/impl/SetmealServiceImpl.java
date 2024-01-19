@@ -2,10 +2,14 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.entity.SetmealDish;
+import com.sky.exception.SetmealEnableFailedException;
+import com.sky.mapper.DishMapper;
 import com.sky.mapper.SetmealDishMapper;
 import com.sky.mapper.SetmealMapper;
 import com.sky.result.PageResult;
@@ -25,6 +29,8 @@ public class SetmealServiceImpl implements SetmealService {
     private SetmealMapper setmealMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private DishMapper dishMapper;
 
     /**
      * 新增套餐
@@ -76,5 +82,28 @@ public class SetmealServiceImpl implements SetmealService {
         SetmealVO setmealVO = setmealMapper.selectById(id);
         setmealVO.setSetmealDishes(setmealDishMapper.selectBySetmealId(id));
         return setmealVO;
+    }
+
+    /**
+     * 修改套餐状态
+     *
+     * @param status
+     * @param id
+     */
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        if (status.equals(StatusConstant.ENABLE)) {
+            List<Dish> dishes = dishMapper.getBySetmealId(id);
+            dishes.forEach(dish -> {
+                if (dish.getStatus().equals(StatusConstant.DISABLE)) {
+                    throw new SetmealEnableFailedException("套餐中有未启用菜品");
+                }
+            });
+        }
+        Setmeal setmeal = Setmeal.builder()
+                .id(id)
+                .status(status)
+                .build();
+        setmealMapper.update(setmeal);
     }
 }

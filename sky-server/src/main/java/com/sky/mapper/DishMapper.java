@@ -17,6 +17,7 @@ public interface DishMapper {
 
     /**
      * 根据分类id查询菜品数量
+     *
      * @param categoryId
      * @return
      */
@@ -25,6 +26,7 @@ public interface DishMapper {
 
     /**
      * 新增菜品
+     *
      * @param dish
      */
     @AutoFill(value = OperationType.INSERT)
@@ -32,6 +34,7 @@ public interface DishMapper {
 
     /**
      * 分页查询菜品
+     *
      * @param dishDTO
      * @return
      */
@@ -39,6 +42,7 @@ public interface DishMapper {
 
     /**
      * 根据id查询菜品
+     *
      * @param id
      * @return
      */
@@ -47,6 +51,7 @@ public interface DishMapper {
 
     /**
      * 根据id删除菜品
+     *
      * @param id
      */
     @Delete("delete from sky_take_out.dish where id = #{id}")
@@ -54,6 +59,7 @@ public interface DishMapper {
 
     /**
      * 根据id修改菜品
+     *
      * @param dish
      */
     @AutoFill(value = OperationType.UPDATE)
@@ -61,8 +67,19 @@ public interface DishMapper {
 
     /**
      * 根据分类id查询菜品
+     *
      * @param dish
      * @return
      */
     List<Dish> list(Dish dish);
+
+    /**
+     * 根据套餐id查询菜品
+     *
+     * @param id
+     * @return
+     */
+    @Select("select * from sky_take_out.dish " +
+            "where id in (select dish_id from sky_take_out.setmeal_dish where setmeal_id = #{id})")
+    List<Dish> getBySetmealId(Long id);
 }

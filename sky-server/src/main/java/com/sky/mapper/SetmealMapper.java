@@ -55,4 +55,12 @@ public interface SetmealMapper {
      */
     @Select("select * from sky_take_out.setmeal where id = #{id}")
     SetmealVO selectById(Long id);
+
+    /**
+     * 修改套餐
+     *
+     * @param setmeal
+     */
+    @AutoFill(value = OperationType.UPDATE)
+    void update(Setmeal setmeal);
 }

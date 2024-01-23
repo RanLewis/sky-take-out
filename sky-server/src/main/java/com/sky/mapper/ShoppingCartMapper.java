@@ -39,4 +39,11 @@ public interface ShoppingCartMapper {
             "VALUES " +
             "(#{name},#{image},#{userId},#{dishId},#{setmealId},#{dishFlavor},#{number},#{amount},#{createTime})")
     void insertShoppingCart(ShoppingCart shoppingCart);
+
+    /**
+     * 删除购物车
+     *
+     * @param shoppingCart
+     */
+    void delete(ShoppingCart shoppingCart);
 }

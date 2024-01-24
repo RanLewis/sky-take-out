@@ -23,6 +23,7 @@ import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -290,6 +291,13 @@ public class OrderServiceImpl implements OrderService {
      */
     @Override
     public void rejection(OrdersRejectionDTO ordersRejectionDTO) {
+        Orders orders1 = orderMapper.getById(ordersRejectionDTO.getId());
+        if (orders1 == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        if (orders1.getStatus() > 2) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
         Orders orders = Orders.builder()
                 .id(ordersRejectionDTO.getId())
                 .status(Orders.CANCELLED)
@@ -298,7 +306,37 @@ public class OrderServiceImpl implements OrderService {
                 .estimatedDeliveryTime(null)
                 .build();
         // 退款
+        if (orders1.getPayStatus() == Orders.PAID) {
+            // 退款
+        }
+        orderMapper.update(orders);
+    }
 
+    /**
+     * 商家取消订单
+     *
+     * @param ordersCancelDTO
+     */
+    @Override
+    public void cancelByAdmin(OrdersCancelDTO ordersCancelDTO) {
+        Orders orders1 = orderMapper.getById(ordersCancelDTO.getId());
+        if (orders1 == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+        if (orders1.getStatus() > 4) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+        Orders orders = Orders.builder()
+                .id(ordersCancelDTO.getId())
+                .cancelReason(ordersCancelDTO.getCancelReason())
+                .status(Orders.CANCELLED)
+                .cancelTime(LocalDateTime.now())
+                .estimatedDeliveryTime(null)
+                .build();
+        // 退款
+        if (orders1.getPayStatus() == Orders.PAID) {
+            // 退款
+        }
         orderMapper.update(orders);
     }
 }

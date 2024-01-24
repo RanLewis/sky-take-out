@@ -20,20 +20,6 @@ public interface OrderService {
      */
     OrderSubmitVO orderSubmit(OrdersSubmitDTO ordersSubmitDTO);
 
-    /**
-     * 订单支付
-     *
-     * @param ordersPaymentDTO
-     * @return
-     */
-    OrderPaymentVO payment(OrdersPaymentDTO ordersPaymentDTO) throws Exception;
-
-    /**
-     * 支付成功，修改订单状态
-     *
-     * @param outTradeNo
-     */
-    void paySuccess(String outTradeNo);
 
     /**
      * 获取历史订单
@@ -50,4 +36,19 @@ public interface OrderService {
      * @return
      */
     OrderVO getOrderById(Long id);
+
+    /**
+     * 取消订单
+     *
+     * @param id
+     */
+    void cancel(Long id);
+
+    /**
+     * 订单支付
+     *
+     * @param ordersPaymentDTO
+     * @return
+     */
+    void payment(OrdersPaymentDTO ordersPaymentDTO);
 }

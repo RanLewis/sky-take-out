@@ -31,13 +31,6 @@ public interface OrderMapper {
      */
     void update(Orders orders);
 
-    /**
-     * 支付
-     *
-     * @param userId
-     */
-    @Update("update sky_take_out.orders set pay_status = 1 and status = 2 where user_id = #{userId}")
-    void pay(Long userId);
 
     /**
      * 分页查询

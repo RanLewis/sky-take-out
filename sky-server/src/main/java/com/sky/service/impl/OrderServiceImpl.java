@@ -107,62 +107,6 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-    /**
-     * 订单支付
-     *
-     * @param ordersPaymentDTO
-     * @return
-     */
-    @Override
-    public OrderPaymentVO payment(OrdersPaymentDTO ordersPaymentDTO) throws Exception {
-        // 当前登录用户id
-        Long userId = BaseContext.getCurrentId();
-        User user = userMapper.getById(userId);
-        orderMapper.pay(userId);
-
-        //调用微信支付接口，生成预支付交易单
-        /* JSONObject jsonObject = weChatPayUtil.pay(
-                ordersPaymentDTO.getOrderNumber(),
-                //商户订单号
-                new BigDecimal(0.01),
-                //支付金额，单位 元
-                "苍穹外卖订单",
-                //商品描述
-                user.getOpenid()
-                //微信用户的openid
-        );
-
-        if (jsonObject.getString("code") != null && jsonObject.getString("code").equals("ORDERPAID")) {
-            throw new OrderBusinessException("该订单已支付");
-        }*/
-
-        //OrderPaymentVO vo = jsonObject.toJavaObject(OrderPaymentVO.class);
-        //vo.setPackageStr(jsonObject.getString("package"));
-        OrderPaymentVO vo = new OrderPaymentVO();
-        return vo;
-    }
-
-    /**
-     * 支付成功，修改订单状态
-     *
-     * @param outTradeNo
-     */
-    @Override
-    public void paySuccess(String outTradeNo) {
-
-        // 根据订单号查询订单
-        Orders ordersDB = orderMapper.getByNumber(outTradeNo);
-
-        // 根据订单id更新订单的状态、支付方式、支付状态、结账时间
-        Orders orders = Orders.builder()
-                .id(ordersDB.getId())
-                .status(Orders.TO_BE_CONFIRMED)
-                .payStatus(Orders.PAID)
-                .checkoutTime(LocalDateTime.now())
-                .build();
-
-        orderMapper.update(orders);
-    }
 
     /**
      * 获取历史订单
@@ -206,5 +150,42 @@ public class OrderServiceImpl implements OrderService {
         List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(id);
         orderVO.setOrderDetailList(orderDetails);
         return orderVO;
+    }
+
+    /**
+     * 取消订单
+     *
+     * @param id
+     */
+    @Override
+    public void cancel(Long id) {
+        // 查询订单是否存在
+        Orders orders = orderMapper.getById(id);
+        if (orders == null) {
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        }
+
+        // 查询账单是否可退款
+        if (orders.getStatus() > 2) {
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        // 退款
+
+        // 修改订单状态为已取消
+        orders.setStatus(Orders.CANCELLED);
+        // 取消时间,原因
+        orders.setCancelTime(LocalDateTime.now());
+        orders.setCancelReason("用户取消");
+        orderMapper.update(orders);
+    }
+
+    @Override
+    public void payment(OrdersPaymentDTO ordersPaymentDTO) {
+        Orders order = orderMapper.getByNumber(ordersPaymentDTO.getOrderNumber());
+        order.setStatus(Orders.TO_BE_CONFIRMED);
+        order.setPayStatus(Orders.PAID);
+        order.setCheckoutTime(LocalDateTime.now());
+        orderMapper.update(order);
     }
 }

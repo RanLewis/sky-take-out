@@ -191,4 +191,20 @@ public class OrderServiceImpl implements OrderService {
         }
         return new PageResult(orders.getTotal(), list);
     }
+
+    /**
+     * 根据订单id查询订单
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public OrderVO getOrderById(Long id) {
+        OrderVO orderVO = new OrderVO();
+        Orders order = orderMapper.getById(id);
+        BeanUtils.copyProperties(order, orderVO);
+        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(id);
+        orderVO.setOrderDetailList(orderDetails);
+        return orderVO;
+    }
 }

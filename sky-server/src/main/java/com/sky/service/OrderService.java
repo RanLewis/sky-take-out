@@ -51,4 +51,10 @@ public interface OrderService {
      * @return
      */
     void payment(OrdersPaymentDTO ordersPaymentDTO);
+
+    /**再来一单
+     *
+     * @param id
+     */
+    void repetition(Long id);
 }

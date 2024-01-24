@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.druid.sql.dialect.blink.parser.BlinkStatementParser;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -187,5 +188,49 @@ public class OrderServiceImpl implements OrderService {
         order.setPayStatus(Orders.PAID);
         order.setCheckoutTime(LocalDateTime.now());
         orderMapper.update(order);
+    }
+
+    /**
+     * 再来一单
+     *
+     * @param id
+     */
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void repetition(Long id) {
+        ShoppingCart Cart = new ShoppingCart();
+        List<ShoppingCart> list = shoppingCartMapper.list(Cart);
+        if (!list.isEmpty()) {
+            throw new OrderBusinessException("购物车中有数据");
+        }
+
+        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(id);
+
+        Long userId = BaseContext.getCurrentId();
+        for (OrderDetail order : orderDetails) {
+            ShoppingCart shoppingCart = ShoppingCart.builder()
+                    .userId(userId)
+                    .build();
+            BeanUtils.copyProperties(order, shoppingCart);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            shoppingCartMapper.insertShoppingCart(shoppingCart);
+        }
+
+        Orders orders = orderMapper.getById(id);
+        orders.setOrderTime(LocalDateTime.now());
+        orders.setPayStatus(Orders.UN_PAID);
+
+        // 待付款
+        orders.setStatus(Orders.PENDING_PAYMENT);
+        orders.setNumber((System.currentTimeMillis()) + "::" + userId);
+        orderMapper.insert(orders);
+
+        List<OrderDetail> orderDetails1 = orderDetailMapper.getByOrderId(id);
+        Long orderId = orders.getId();
+        for (OrderDetail detail : orderDetails1) {
+            detail.setOrderId(orderId);
+        }
+        orderDetailMapper.insertList(orderDetails1);
+        shoppingCartMapper.deleteByUserId(userId);
     }
 }

@@ -233,4 +233,22 @@ public class OrderServiceImpl implements OrderService {
         orderDetailMapper.insertList(orderDetails1);
         shoppingCartMapper.deleteByUserId(userId);
     }
+
+    @Override
+    public PageResult conditionSearch(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(), ordersPageQueryDTO.getPageSize());
+        List<OrderVO> list = new ArrayList<>();
+        Page<Orders> orders = orderMapper.pageQuery(ordersPageQueryDTO);
+        if (orders.getTotal() > 0 && orders != null) {
+            for (Orders order : orders) {
+                OrderVO orderVO = new OrderVO();
+                Long orderId = order.getId();
+                List<OrderDetail> orderDetailList = orderDetailMapper.getByOrderId(orderId);
+                BeanUtils.copyProperties(order, orderVO);
+                orderVO.setOrderDetailList(orderDetailList);
+                list.add(orderVO);
+            }
+        }
+        return new PageResult(orders.getTotal(), list);
+    }
 }

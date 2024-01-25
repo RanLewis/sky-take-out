@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 /**
  * @author Ran Lewis
  */
-@Component
+//@Component
 @Slf4j
 public class MyTask {
 

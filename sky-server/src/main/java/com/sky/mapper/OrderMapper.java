@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Update;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface OrderMapper {
@@ -55,6 +56,7 @@ public interface OrderMapper {
 
     /**
      * 根据订单状态查询订单数量
+     *
      * @param
      * @return
      */
@@ -70,4 +72,12 @@ public interface OrderMapper {
      */
     @Select("select * from sky_take_out.orders where status = #{status} and order_time < #{orderTime}")
     List<Orders> getByStatusAndTimeLT(Integer status, LocalDateTime orderTime);
+
+    /**
+     * 统计营业额
+     *
+     * @param map
+     * @return
+     */
+    Double sumByMap(Map map);
 }

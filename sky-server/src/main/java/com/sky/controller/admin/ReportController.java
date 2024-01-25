@@ -76,8 +76,7 @@ public class ReportController {
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
         log.info("订单数据统计--begin: {}, end: {}", begin, end);
-        //OrderReportVO orderReportVO = reportService.ordersStatistics(begin, end);
-        //return Result.success(orderReportVO);
-        return null;
+        OrderReportVO orderReportVO = reportService.ordersStatistics(begin, end);
+        return Result.success(orderReportVO);
     }
 }

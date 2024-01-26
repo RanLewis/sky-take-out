@@ -1,18 +1,22 @@
 package com.sky.controller.user;
 
 import com.sky.constant.StatusConstant;
+import com.sky.entity.Dish;
 import com.sky.entity.Setmeal;
 import com.sky.result.Result;
 import com.sky.service.SetmealService;
 import com.sky.vo.DishItemVO;
+import com.sky.vo.DishVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 @RestController("userSetmealController")
@@ -21,6 +25,9 @@ import java.util.List;
 public class SetmealController {
     @Autowired
     private SetmealService setmealService;
+    @Autowired
+    private RedisTemplate redisTemplate;
+
 
     /**
      * 条件查询
@@ -30,13 +37,22 @@ public class SetmealController {
      */
     @GetMapping("/list")
     @ApiOperation("根据分类id查询套餐")
-    @Cacheable(value = "setmealCache" , key = "#categoryId")
     public Result<List<Setmeal>> list(Long categoryId) {
-        Setmeal setmeal = new Setmeal();
-        setmeal.setCategoryId(categoryId);
-        setmeal.setStatus(StatusConstant.ENABLE);
+        String key = "setmeal_" + categoryId;
+        // 查询redis中是否存在菜单缓存
+        List<Setmeal> list = (List<Setmeal>) (redisTemplate.opsForValue().get(key));
+        if (list == null || list.isEmpty()) {
 
-        List<Setmeal> list = setmealService.list(setmeal);
+            // 有直接返回,没有查询数据库,缓存
+            Setmeal setmeal = new Setmeal();
+            setmeal.setCategoryId(categoryId);
+            setmeal.setStatus(StatusConstant.ENABLE);
+
+            list = setmealService.list(setmeal);
+            redisTemplate.opsForValue().set(key, list);
+            return Result.success(list);
+        }
+        // 存在缓存,无需查询数据库
         return Result.success(list);
     }
 

@@ -12,9 +12,11 @@ import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RequestMapping("/admin/setmeal")
 @RestController
@@ -24,6 +26,9 @@ public class SetmealController {
 
     @Autowired
     private SetmealService setmealService;
+    @Autowired
+    private RedisTemplate redisTemplate;
+
 
     /**
      * 新增套餐
@@ -33,10 +38,10 @@ public class SetmealController {
      */
     @PostMapping
     @ApiOperation("新增套餐")
-    @CacheEvict(value = "setmealCache", key = "#setmealDTO.id")
     public Result addSetmeal(@RequestBody SetmealDTO setmealDTO) {
         log.info("新增套餐：{}", setmealDTO);
         setmealService.addSetmeal(setmealDTO);
+        clearCache("setmeal_" + setmealDTO.getCategoryId());
         return Result.success();
     }
 
@@ -62,10 +67,10 @@ public class SetmealController {
      */
     @DeleteMapping()
     @ApiOperation("删除套餐")
-    @CacheEvict(value = "setmealCache", allEntries = true)
     public Result delete(@RequestParam List<Long> ids) {
         log.info("删除套餐：{}", ids);
         setmealService.delete(ids);
+        clearCache("setmeal_*");
         return Result.success();
     }
 
@@ -95,6 +100,7 @@ public class SetmealController {
     public Result updateStatus(@PathVariable Integer status, Long id) {
         log.info("修改套餐状态：{}，id：{}", status, id);
         setmealService.updateStatus(status, id);
+        clearCache("setmeal_*");
         return Result.success();
     }
 
@@ -106,10 +112,18 @@ public class SetmealController {
      */
     @PutMapping
     @ApiOperation("修改套餐")
-    @CacheEvict(value = "setmealCache", allEntries = true)
     public Result update(@RequestBody SetmealDTO setmealDTO) {
         log.info("修改套餐：{}", setmealDTO);
         setmealService.update(setmealDTO);
+        clearCache("setmeal_*");
         return Result.success();
+    }
+
+    /**
+     * 清理缓存
+     */
+    private void clearCache(String pattern) {
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
     }
 }
